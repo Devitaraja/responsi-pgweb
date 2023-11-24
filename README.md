@@ -11,7 +11,9 @@ WEBGIS ini merupakan platfrom yang dapat digunakan untuk mencari atau pun menget
 2. Data shp batas administrasi Kabupaten Sleman
 # KOMPONEN PENTING :
 1. Landing page
-![WhatsApp Image 2023-11-25 at 01 18 18](https://github.com/Devitaraja/responsi-pgweb/assets/142875806/cc87db8f-051a-412b-a1ef-7861719c4ebb)
+ ![aff7ce7f-6f51-471b-9f74-bf0a6decd786](https://github.com/Devitaraja/responsi-pgweb/assets/142875806/161f451c-730e-4ccc-838c-589c1896c83a)
+
+
 2. Explore/maps persebaran lapangan futsal
 ![043e9d44-224d-48c1-8809-6858c7b53bd8](https://github.com/Devitaraja/responsi-pgweb/assets/142875806/abe711b4-0951-4a60-85ac-c106eb1f7340)
 3. About
