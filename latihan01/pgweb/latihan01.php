@@ -6,7 +6,7 @@
         <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
-        <meta name="author" content="Diandra">
+        <meta name="author" content="Yellove">
         <meta name="description" content="leaflet basic">
         
         <!-- Judul pada tab browser -->
