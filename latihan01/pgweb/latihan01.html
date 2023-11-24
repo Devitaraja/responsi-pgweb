@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Metadata -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="author" content="Yellove Devitaraja">
+        <meta name="description" content="leaflet basic">
+        
+        <!-- Judul pada tab browser -->
+        <title>WEBGIS Yellove</title>
+        
+        <!-- Tab browser icon -->
+        <link rel="icon" type="image/x-icon" href="http://luk.staff.ugm.ac.id/logo/UGM/Resmi/Warna.gif">
+
+        <!-- Leaflet CSS Library -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
+        integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
+        crossorigin=""/>
+        <link rel="stylesheet" href="assets/plugins/Leaflet.AnimatedSearchBox.css" />
+        <link rel="stylesheet" href="assets/plugins/Control.Coordinates.css" />
+        <link rel="stylesheet" href="assets/plugins/leaflet-mouseposition/L.Control.MousePosition.css"/>
+        <link rel="stylesheet" href="assets/plugins/leaflet.measurecontrol.css"/>
+        <link rel="stylesheet" href="assets/plugins/leaflet-measure/leaflet-measure.css">
+        <link rel="stylesheet" href="assets/plugins/leaflet-easyprint/easyPrint.css">
+        <link rel="stylesheet" href="assets/plugins/leaflet-Leaflet.markercluster-1.4.1/Leaflet.markercluster-1.4.1/dist/MarkerCluster.css"/>
+        <link rel="stylesheet" href="assets/plugins/leaflet-Leaflet.markercluster-1.4.1/Leaflet.markercluster-1.4.1/dist/MarkerCluster.Default.css"/>
+              
+        <!--Simbologi Judul-->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+        
+        <style>
+        /* Tampilan peta fullscreen */
+        #map {
+            height: 730px;
+        }
+        
+        </style>
+
+
+        <style>
+            *.info {
+                padding: 6px 6px;
+                font: 14px/16px Arial, Helvetica, sans-serif;
+                background: white;
+                background: rgba(255,255,255,0.8);
+                box-shadow: 0 0 15px rgba(0,0,0,0.2);
+                border-radius: 5px;
+                text-align: center;
+            }
+            .info h2 {
+                margin: 0 0 5px;
+                color: #777;
+            }
+            </style>
+        </head>
+        <body>
+            <div id="map"></div>
+            <div id="geolet" style="position:absolute;top:0;right:0;bottom:0;left:0"></div>
+        </body>
+
+            <!-- Leaflet JavaScript Library -->
+            <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
+            integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
+            crossorigin=""></script>
+            <script src="assets/plugins/leaflet.ajax.js"></script>
+            <script src="assets/plugins/leaflet.ajax.min.js"></script> 
+            <script src="assets/plugins/Leaflet.AnimatedSearchBox.js" ></script>
+            <script src="assets/plugins/leafler.geolet.js" ></script>
+            <script src="data/line_sleman.js"></script>
+            <script src="data/area_sleman.js"></script>
+            <script src="assets/img/logo/search.png"></script>
+            <script src="assets/plugins/leaflet-mouseposition/L.Control.MousePosition.js"></script>
+            <script src="assets/plugins/leaflet-measure/leaflet-measure.js"></script>
+            <script src="assets/plugins/print.Provider.js" ></script>
+            <script src="assets/plugins/Control.Print.js"></script>
+            <script src="assets/plugins/leaflet-easyprint/leaflet.easyPrint.js"></script>
+            <script src="assets/img/logo/rs.png"></script>
+            <script src="assets/plugins/Leaflet.markercluster-1.4.1/Leaflet.markercluster-1.4.1/dist/leaflet.markercluster-src.js"></script>
+            <script type="text/javascript" src="geojson-sample.js"></script>
+            
+            <script>
+            /* Initial Map */
+            var map = L.map('map').setView([-7.696499942818468, 110.38675628684814], 11); //lat, long, zoom
+
+            //plugin geolet
+            var geolet = L.geolet('geolet');
+			L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+				attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+			}).addTo(map);
+			L.geolet({
+				position: 'topleft'
+			}).addTo(map);
+
+            //plugin mouse coordinate
+            L.control.mousePosition({position:'bottomright',
+            separator: ',',
+            prefix: 'Koordinat : '
+            }).addTo(map);
+            
+            
+            /* Tile Basemap */ 
+            var basemap1 = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | <a href="DIVSIGUGM" target="_blank">DIVSIG UGM</a>' //menambahkan nama//
+            });
+            
+            var basemap2 = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri | <a href="Latihan WebGIS" target="_blank">DIVSIG UGM</a>'
+            });
+            var basemap3 = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri | <a href="Lathan WebGIS" target="_blank">DIVSIG UGM</a>'
+            });
+
+            var basemap4 = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri &mdash; National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC',
+            ext:'png'
+            });
+
+            basemap1.addTo(map);
+
+            //Marker
+
+            /* Layer Marker */
+            var marker1 = L.marker([-7.860823127978667, 110.10888156889592]);
+            marker1.addTo(map);
+            marker1.bindPopup("Selo Futsal");
+
+            var marker2 = L.marker([-7.8902835600566785, 110.13138084656521]);
+            marker2.addTo(map);
+            marker2.bindPopup("Toyan Futsal");
+            
+            var marker3 = L.marker([-7.91009167211434, 110.14436194627483]);
+            marker3.addTo(map);
+            marker3.bindPopup("Bojong Futsal");
+      
+            var marker4 = L.marker([-7.860193407008287, 110.15729426827755]);
+            marker4.addTo(map);
+            marker4.bindPopup("Golden Futsal");
+
+            var marker5 = L.marker([-7.847949729751265, 110.15540599330052]);
+            marker5.addTo(map);
+            marker5.bindPopup("Dyo Futsal");
+
+            var marker6 = L.marker([-7.841997811627662, 110.17085551788871]);
+            marker6.addTo(map);
+            marker6.bindPopup("Spirit Futsal Arena");
+            
+            var marker7 = L.marker([-7.819766208904595, 110.22494192725759]);
+            marker7.addTo(map);
+            marker7.bindPopup("Power Futsal");
+      
+            var marker8 = L.marker([-7.766728863244334, 110.27498805885894]);
+            marker8.addTo(map);
+            marker8.bindPopup("Sholahudin Futsal");
+
+            var marker9 = L.marker([-7.978891690576317, 110.6154721954748]);
+            marker9.addTo(map);
+            marker9.bindPopup("Jalarta Futsal");
+
+            var marker10 = L.marker([-7.956705956997505, 110.54390288371442]);
+            marker10.addTo(map);
+            marker10.bindPopup("Putra Mustika Futsal");
+
+            var marker11 = L.marker([-7.973710196541971, 110.59897245716726]);
+            marker11.addTo(map);
+            marker11.bindPopup("Djangkar Bumi Sasana Futsal");
+
+            var marker12 = L.marker([-7.954946364985906, 110.59141707487501]);
+            marker12.addTo(map);
+            marker12.bindPopup("Kick Off Futsal");
+
+            var marker13 = L.marker([-7.9413621965400285, 110.60617913454007]);
+            marker13.addTo(map);
+            marker13.bindPopup("Goal Futsal");
+
+            var marker14 = L.marker([-7.946542652753423, 110.66522736969574]);
+            marker14.addTo(map);
+            marker14.bindPopup("ASA Futsal Center");
+
+            var marker15 = L.marker([-7.847879664386365, 110.73878650874995]);
+            marker15.addTo(map);
+            marker15.bindPopup("Insani Futsal");
+
+            var marker16 = L.marker([-7.859103059719937, 110.77376067608118]);
+            marker16.addTo(map);
+            marker16.bindPopup("Huras Sport Center");
+
+            var marker17 = L.marker([-7.98358771371087, 110.31397817017378]);
+            marker17.addTo(map);
+            marker17.bindPopup("Sembleng Futsal");
+
+            var marker18 = L.marker([-7.944146366121152, 110.32290456313095]);
+            marker18.addTo(map);
+            marker18.bindPopup("Futsal Talk With Your Feet, Play With Your Heart");
+
+            var marker19 = L.marker([-7.887684392586852, 110.32871334775142]);
+            marker19.addTo(map);
+            marker19.bindPopup("The Reds Futsal");
+
+            var marker20 = L.marker([-7.848996563492404, 110.38706416096834]);
+            marker20.addTo(map);
+            marker20.bindPopup("Glagah Futsal");
+
+            var marker21 = L.marker([-7.8397846441755705, 110.39055126137849]);
+            marker21.addTo(map);
+            marker21.bindPopup("Prima Futsal");
+
+            var marker22 = L.marker([-7.8105354488864664, 110.41403107631432]);
+            marker22.addTo(map);
+            marker22.bindPopup("Galaxi Futsal");
+
+            var marker23 = L.marker([-7.829527650104686, 110.4778812624907]);
+            marker23.addTo(map);
+            marker23.bindPopup("Ardian Futsal");
+
+            var marker24 = L.marker([-7.834106460197864, 110.31580978744678]);
+            marker15.addTo(map);
+            marker15.bindPopup("DMT Futsal");
+
+            var marker25 = L.marker([-7.828947556274872, 110.35864545955324]);
+            marker25.addTo(map);
+            marker25.bindPopup("GPS Futsal");
+
+            var marker26 = L.marker([-7.814635423597383, 110.34167917310354]);
+            marker26.addTo(map);
+            marker26.bindPopup("Semar Futsal");
+
+            var marker27 = L.marker([-7.806979895424751, 110.33428792009322]);
+            marker27.addTo(map);
+            marker27.bindPopup("Dolano Futsal");
+
+            var marker28 = L.marker([-7.811639798849553, 110.31866549895774]);
+            marker28.addTo(map);
+            marker28.bindPopup("Salvator Futsal");
+
+            var marker29 = L.marker([-7.804649924224253, 110.32017734616441]);
+            marker29.addTo(map);
+            marker29.bindPopup("Lapangan Futsal UMY");
+
+            var marker30 = L.marker([-7.806444625627836, 110.3902189330359]);
+            marker30.addTo(map);
+            marker30.bindPopup("Bardosono Happy Futsal");
+
+            var marker31 = L.marker([-7.800210247548959, 110.38941986664449]);
+            marker31.addTo(map);
+            marker31.bindPopup("MU Futsal");
+
+            var marker32 = L.marker([-7.798330020044579, 110.38102966953468]);
+            marker32.addTo(map);
+            marker32.bindPopup("Tifosi Futsal");
+
+            var marker33 = L.marker([-7.787642250427691, 110.37743386908824]);
+            marker33.addTo(map);
+            marker33.bindPopup("Lempuyangan Futsal");
+
+            var marker34 = L.marker([-7.7846733771761825, 110.39611204598742]);
+            marker34.addTo(map);
+            marker34.bindPopup("Lapangan Futsal UIN");
+
+            var marker35 = L.marker([-7.781011737868753, 110.38582406619804]);
+            marker35.addTo(map);
+            marker35.bindPopup("Next 2 Futsal");
+
+            var marker36 = L.marker([-7.777745924363833, 110.41489010782588]);
+            marker36.addTo(map);
+            marker36.bindPopup("Pelle Futsal");
+
+            var marker37 = L.marker([-7.774282155108563, 110.4118936088581]);
+            marker37.addTo(map);
+            marker37.bindPopup("Sport Academy Yogyakarta");
+
+            var marker38 = L.marker([-7.770026628030433, 110.40490177793325]);
+            marker38.addTo(map);
+            marker38.bindPopup("Telaga Futsal 1");
+
+            var marker39 = L.marker([-7.766463827835584, 110.40859745977842]);
+            marker39.addTo(map);
+            marker39.bindPopup("Forza Futsal");
+
+            var marker40 = L.marker([-7.763395836934088, 110.40540119422174]);
+            marker40.addTo(map);
+            marker40.bindPopup("Anfield Futsal");
+
+            var marker41 = L.marker([-7.762109253371071, 110.40270434498045]);
+            marker41.addTo(map);
+            marker41.bindPopup("Gaol Futsal");
+
+            var marker42 = L.marker([-7.758348448268122, 110.40809804312246]);
+            marker42.addTo(map);
+            marker42.bindPopup("Planet Futsal");
+            
+            var marker43 = L.marker([-7.8234344742628394, 110.36704028704384]);
+            marker43.addTo(map);
+            marker43.bindPopup("Futsal Jogokaryan");
+      
+            var marker44 = L.marker([-7.824839010213725, 110.36764788740665]);
+            marker44.addTo(map);
+            marker44.bindPopup("Empat R Futsal");
+
+            var marker45 = L.marker([-7.823474603924034, 110.37757202636915]);
+            marker45.addTo(map);
+            marker45.bindPopup("Pamella Futsal");
+
+            var marker46 = L.marker([-7.774235615112052, 110.34095048279006]);
+            marker46.addTo(map);
+            marker46.bindPopup("Paragon Futsal");
+
+            var marker47 = L.marker([-7.7762766129934, 110.3883290226596]);
+            marker47.addTo(map);
+            marker47.bindPopup("Pro 2 Futsal RRI");
+
+            var marker48 = L.marker([-7.772463876006989, 110.40507006126028]);
+            marker48.addTo(map);
+            marker48.bindPopup("Goeboex Futsal");
+
+            var marker49 = L.marker([-7.76712164355803, 110.3997770198561]);
+            marker49.addTo(map);
+            marker49.bindPopup("Selma Futsal");
+
+            var marker50 = L.marker([-7.756235090346174, 110.3750194060606]);
+            marker50.addTo(map);
+            marker50.bindPopup("Golden Goal Futsal");
+
+            var marker51 = L.marker([-7.751283231551185, 110.40534435087338]);
+            marker51.addTo(map);
+            marker51.bindPopup("Telaga Futsal 3");
+
+            var marker52 = L.marker([-7.7387350572455444, 110.39214693562981]);
+            marker52.addTo(map);
+            marker52.bindPopup("Jakal 7 Futsal");
+
+            var marker53 = L.marker([-7.7305649866219985, 110.38474362415151]);
+            marker53.addTo(map);
+            marker53.bindPopup("Centro Futsal");
+
+            var marker54 = L.marker([-7.727455107580853, 110.38015227527815]);
+            marker54.addTo(map);
+            marker54.bindPopup("Mudal Futsal");
+
+            var marker55 = L.marker([-7.718814693306822, 110.346873114969]);
+            marker55.addTo(map);
+            marker55.bindPopup("Bejo Futsal Sleman");
+
+            var marker56 = L.marker([-7.708025721339019, 110.36912665238819]);
+            marker56.addTo(map);
+            marker56.bindPopup("DMT Futsal 2");
+
+            
+            /* Control Layer */
+            var baseMaps = {
+                "OpenStreetMap": basemap1,
+                "Esri World Street": basemap2,
+                "Esri Imagery": basemap3,
+                "NatGeo World": basemap4,
+            }
+
+            var overlayMaps = {
+            }
+
+            
+            /* Image Watermark */
+            L.Control.Watermark = L.Control.extend({
+                onAdd: function(map) {
+                    var img = L.DomUtil.create('img');
+                    img.src = 'assets/img/logo/LOGO_SIG_BLUE.png';
+                    img.style.width = '150px';
+                    return img;
+                }
+            });
+
+            L.control.watermark = function(opts) {
+                return new L.Control.Watermark(opts);Search
+            }
+
+            L.control.watermark({ position: 'bottomright' }).addTo(map);
+
+            //plugin measurement
+            var measureControl = new L.Control.Measure({
+                primaryLengthUnit: "meters",
+                secondaryLengthUnit: "kilometers",
+                primaryAreaUnit: "hectares",
+                secondaryAreaUnit: "sqmeters",
+                activeColor: "#FF0000",
+                completedColor: "#00FF00",
+                position:"topleft"
+                });
+            measureControl.addTo(map);
+
+
+            //Title-Subtitle
+            var title = new L.Control();
+            title.onAdd = function (map) {
+                this._div = L.DomUtil.create("div", "info");
+                this.update();
+                return this._div;
+            };
+            title.update = function () {
+                this._div.innerHTML = '<h2>Persebaran Lapangan Futsal</h2>Oleh : Yellove Devitaraja'
+            };
+            title.addTo(map);
+            
+            L.control.layers(baseMaps, overlayMaps, {collapsed: false}).addTo(map);
+
+            //plugin print
+            L.easyPrint({
+            title: 'Print'
+            }).addTo(map);
+
+            /* Scale Bar */
+            L.control.scale({
+                maxWidth: 150,position:'bottomleft'
+            }).addTo(map);
+
+
+            function popUp(f,l){
+                var out = [];
+                if (f.properties){
+                    for(key in f.properties){
+                        out.push(key+": "+f.properties[key]);
+                    }
+                    l.bindPopup(out.join("<br />"));
+                }
+            }
+
+
+            //simbologi map
+            var stylearea = {
+                "color": "#40128B",
+                 "weight" : 1.0,
+                "opacity": 4
+            }
+
+            var stylejalan = {
+                "color": "#CD1818" ,
+                "weight": 3.0,
+                "opacity": 1
+            }
+
+            var jsonTest = new L.GeoJSON.AJAX(["area_sleman.geojson"],{style : stylearea}).addTo(map);   
+            var jsonTest = new L.GeoJSON.AJAX(["line_sleman.geojson"],{style : stylejalan}).addTo(map);
+
+
+            //PopUp keterangan peta
+            var geojson = L.geoJson(dataarea, {
+                onEachFeature: function (feature, layer) {
+                    var popupText = "Kecamatan: " + feature.properties.KECAMATAN;
+                    
+                    if (feature.properties.NAMOBJ) {
+                        popupText += "<br/>Kelurahan: " + feature.properties.DESA;
+                    }
+                    layer.bindPopup(popupText);
+                },
+            style : stylearea
+            }).addTo(map);
+
+            var geojson = L.geoJson(datagaris, {
+                onEachFeature: function (feature, layer) {
+                    var popupText = "Kecamatan: " + feature.properties.KECAMATAN;
+                    
+                    if (feature.properties.NAMOBJ) {
+                        popupText += "<br/>Kelurahan: " + feature.properties.DESA;
+                    }
+                    layer.bindPopup(popupText);
+                },
+                style : stylejalan
+            }).addTo(map);
+
+
+            var markerCluster = L.markerClusterGroup();
+
+            var marker1 = L.marker([-7.860823127978667, 110.10888156889592]);
+            marker1.bindPopup("Selo Futsal");
+            markerCluster.addLayer(marker1);
+
+            var marker2 = L.marker([-7.8902835600566785, 110.13138084656521]);
+            marker2.bindPopup("Toyan Futsal");
+            markerCluster.addLayer(marker2);
+
+            var marker3 = L.marker([-7.91009167211434, 110.14436194627483]);
+            marker3.bindPopup("Bojong Futsal");
+            markerCluster.addLayer(marker3);
+      
+            var marker4 = L.marker([-7.860193407008287, 110.15729426827755]);
+            marker4.bindPopup("Golden Futsal");
+            markerCluster.addLayer(marker4);
+
+            var marker5 = L.marker([-7.847949729751265, 110.15540599330052]);
+            marker5.bindPopup("Dyo Futsal");
+            markerCluster.addLayer(marker5);
+
+            var marker6 = L.marker([-7.841997811627662, 110.17085551788871]);
+            marker6.bindPopup("Spirit Futsal Arena");
+            markerCluster.addLayer(marker6);
+            
+            var marker7 = L.marker([-7.819766208904595, 110.22494192725759]);
+            marker7.bindPopup("Power Futsal");
+            markerCluster.addLayer(marker7);
+      
+            var marker8 = L.marker([-7.766728863244334, 110.27498805885894]);
+            marker8.bindPopup("Sholahudin Futsal");
+            markerCluster.addLayer(marker8);
+
+            var marker9 = L.marker([-7.978891690576317, 110.6154721954748]);
+            marker9.bindPopup("Jalarta Futsal");
+            markerCluster.addLayer(marker9);
+
+            var marker10 = L.marker([-7.956705956997505, 110.54390288371442]);
+            marker10.bindPopup("Putra Mustika Futsal");
+            markerCluster.addLayer(marker10);
+
+            var marker11 = L.marker([-7.973710196541971, 110.59897245716726]);
+            marker11.bindPopup("Djangkar Bumi Sasana Futsal");
+            markerCluster.addLayer(marker11);
+
+            var marker12 = L.marker([-7.954946364985906, 110.59141707487501]);
+            marker12.bindPopup("Kick Off Futsal");
+            markerCluster.addLayer(marker12);
+
+            var marker13 = L.marker([-7.9413621965400285, 110.60617913454007]);
+            marker13.bindPopup("Goal Futsal");
+            markerCluster.addLayer(marker13);
+
+            var marker14 = L.marker([-7.946542652753423, 110.66522736969574]);
+            marker14.bindPopup("ASA Futsal Center");
+            markerCluster.addLayer(marker14);
+
+            var marker15 = L.marker([-7.847879664386365, 110.73878650874995]);
+            marker15.bindPopup("Insani Futsal");
+            markerCluster.addLayer(marker15);
+
+            var marker16 = L.marker([-7.859103059719937, 110.77376067608118]);
+            marker16.bindPopup("Huras Sport Center");
+            markerCluster.addLayer(marker16);
+
+            var marker17 = L.marker([-7.98358771371087, 110.31397817017378]);
+            marker17.bindPopup("Sembleng Futsal");
+            markerCluster.addLayer(marker17);
+
+            var marker18 = L.marker([-7.944146366121152, 110.32290456313095]);
+            marker18.bindPopup("Futsal Talk With Your Feet, Play With Your Heart");
+            markerCluster.addLayer(marker18);
+
+            var marker19 = L.marker([-7.887684392586852, 110.32871334775142]);
+            marker19.bindPopup("The Reds Futsal");
+            markerCluster.addLayer(marker19);
+
+            var marker20 = L.marker([-7.848996563492404, 110.38706416096834]);
+            marker20.bindPopup("Glagah Futsal");
+            markerCluster.addLayer(marker20);
+
+            var marker21 = L.marker([-7.8397846441755705, 110.39055126137849]);
+            marker21.bindPopup("Prima Futsal");
+            markerCluster.addLayer(marker21);
+
+            var marker22 = L.marker([-7.8105354488864664, 110.41403107631432]);
+            marker22.bindPopup("Galaxi Futsal");
+            markerCluster.addLayer(marker22);
+
+            var marker23 = L.marker([-7.829527650104686, 110.4778812624907]);
+            marker23.bindPopup("Ardian Futsal");
+            markerCluster.addLayer(marker23);
+
+            var marker24 = L.marker([-7.834106460197864, 110.31580978744678]);
+            marker24.bindPopup("DMT Futsal");
+            markerCluster.addLayer(marker24);
+
+            var marker25 = L.marker([-7.828947556274872, 110.35864545955324]);
+            marker25.bindPopup("GPS Futsal");
+            markerCluster.addLayer(marker25);
+
+            var marker26 = L.marker([-7.814635423597383, 110.34167917310354]);
+            marker26.bindPopup("Semar Futsal");
+            markerCluster.addLayer(marker26);
+
+            var marker27 = L.marker([-7.806979895424751, 110.33428792009322]);
+            marker27.bindPopup("Dolano Futsal");
+            markerCluster.addLayer(marker27);
+
+            var marker28 = L.marker([-7.811639798849553, 110.31866549895774]);
+            marker28.bindPopup("Salvator Futsal");
+            markerCluster.addLayer(marker28);
+
+            var marker29 = L.marker([-7.804649924224253, 110.32017734616441]);
+            marker29.bindPopup("Lapangan Futsal UMY");
+            markerCluster.addLayer(marker29);
+
+            var marker30 = L.marker([-7.806444625627836, 110.3902189330359]);
+            marker30.bindPopup("Bardosono Happy Futsal");
+            markerCluster.addLayer(marker30);
+
+            var marker31 = L.marker([-7.800210247548959, 110.38941986664449]);
+            marker31.bindPopup("MU Futsal");
+            markerCluster.addLayer(marker31);
+
+            var marker32 = L.marker([-7.798330020044579, 110.38102966953468]);
+            marker32.bindPopup("Tifosi Futsal");
+            markerCluster.addLayer(marker32);
+
+            var marker33 = L.marker([-7.787642250427691, 110.37743386908824]);
+            marker33.bindPopup("Lempuyangan Futsal");
+            markerCluster.addLayer(marker33);
+
+            var marker34 = L.marker([-7.7846733771761825, 110.39611204598742]);
+            marker34.bindPopup("Lapangan Futsal UIN");
+            markerCluster.addLayer(marker34);
+
+            var marker35 = L.marker([-7.781011737868753, 110.38582406619804]);
+            marker35.bindPopup("Next 2 Futsal");
+            markerCluster.addLayer(marker35);
+
+            var marker36 = L.marker([-7.777745924363833, 110.41489010782588]);
+            marker36.bindPopup("Pelle Futsal");
+            markerCluster.addLayer(marker36);
+
+            var marker37 = L.marker([-7.774282155108563, 110.4118936088581]);
+            marker37.bindPopup("Sport Academy Yogyakarta");
+            markerCluster.addLayer(marker37);
+
+            var marker38 = L.marker([-7.770026628030433, 110.40490177793325]);
+            marker38.bindPopup("Telaga Futsal 1");
+            markerCluster.addLayer(marker38);
+
+            var marker39 = L.marker([-7.766463827835584, 110.40859745977842]);
+            marker39.bindPopup("Forza Futsal");
+            markerCluster.addLayer(marker39);
+
+            var marker40 = L.marker([-7.763395836934088, 110.40540119422174]);
+            marker40.bindPopup("Anfield Futsal");
+            markerCluster.addLayer(marker40);
+
+            var marker41 = L.marker([-7.762109253371071, 110.40270434498045]);
+            marker41.bindPopup("Gaol Futsal");
+            markerCluster.addLayer(marker41);
+
+            var marker42 = L.marker([-7.758348448268122, 110.40809804312246]);
+            marker42.bindPopup("Planet Futsal");
+            markerCluster.addLayer(marker42);
+            
+            var marker43 = L.marker([-7.8234344742628394, 110.36704028704384]);
+            marker43.bindPopup("Futsal Jogokaryan");
+            markerCluster.addLayer(marker43);
+      
+            var marker44 = L.marker([-7.824839010213725, 110.36764788740665]);
+            marker44.bindPopup("Empat R Futsal");
+            markerCluster.addLayer(marker44);
+
+            var marker45 = L.marker([-7.823474603924034, 110.37757202636915]);
+            marker45.bindPopup("Pamella Futsal");
+            markerCluster.addLayer(marker45);
+
+            var marker46 = L.marker([-7.774235615112052, 110.34095048279006]);
+            marker46.bindPopup("Paragon Futsal");
+            markerCluster.addLayer(marker46);
+
+            var marker47 = L.marker([-7.7762766129934, 110.3883290226596]);
+            marker47.bindPopup("Pro 2 Futsal RRI");
+            markerCluster.addLayer(marker47);
+
+            var marker48 = L.marker([-7.772463876006989, 110.40507006126028]);
+            marker48.bindPopup("Goeboex Futsal");
+            markerCluster.addLayer(marker48);
+
+            var marker49 = L.marker([-7.76712164355803, 110.3997770198561]);
+            marker49.bindPopup("Selma Futsal");
+            markerCluster.addLayer(marker49);
+
+            var marker50 = L.marker([-7.756235090346174, 110.3750194060606]);
+            marker50.bindPopup("Golden Goal Futsal");
+            markerCluster.addLayer(marker50);
+
+            var marker51 = L.marker([-7.751283231551185, 110.40534435087338]);
+            marker51.bindPopup("Telaga Futsal 3");
+            markerCluster.addLayer(marker51);
+
+            var marker52 = L.marker([-7.7387350572455444, 110.39214693562981]);
+            marker52.bindPopup("Jakal 7 Futsal");
+            markerCluster.addLayer(marker52);
+
+            var marker53 = L.marker([-7.7305649866219985, 110.38474362415151]);
+            marker53.bindPopup("Centro Futsal");
+            markerCluster.addLayer(marker53);
+
+            var marker54 = L.marker([-7.727455107580853, 110.38015227527815]);
+            marker54.bindPopup("Mudal Futsal");
+            markerCluster.addLayer(marker54);
+
+            var marker55 = L.marker([-7.718814693306822, 110.346873114969]);
+            marker55.bindPopup("Bejo Futsal Sleman");
+            markerCluster.addLayer(marker55);
+
+            var marker56 = L.marker([-7.708025721339019, 110.36912665238819]);
+            marker56.bindPopup("DMT Futsal 2");
+            markerCluster.addLayer(marker56);
+
+            
+            map.addLayer(markerCluster);
+            
+
+            
+            </script>
+</html>
