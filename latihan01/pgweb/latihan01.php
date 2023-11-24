@@ -10,7 +10,7 @@
         <meta name="description" content="leaflet basic">
         
         <!-- Judul pada tab browser -->
-        <title>LeafletJS - Covid19 - Diandra</title>
+        <title>LeafletJS - Covid19 - Yellove</title>
         
         <!-- Leaflet CSS Library -->
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
